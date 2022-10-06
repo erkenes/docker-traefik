@@ -1,0 +1,53 @@
+http:
+  middlewares:
+
+    middlewares-rate-limit:
+      rateLimit:
+        average: 100
+        burst: 50
+
+    # Redirect all requests to HTTPS
+    middlewares-https-redirectscheme:
+      redirectScheme:
+        scheme: https
+        permanent: true
+
+    middlewares-secure-headers:
+      headers:
+        accessControlAllowMethods:
+          - GET
+          - OPTIONS
+          - PUT
+        accessControlMaxAge: 100
+        hostsProxyHeaders:
+          - "X-Forwarded-Host"
+#        sslRedirect: true # Replaced with middlewares-https-recirectscheme
+        stsPreload: true
+#        forceSTSHeader: true
+#        frameDeny: true #overwritten by customFrameOptionsValue
+        customFrameOptionsValue: "allow-from https:{{env "ROOT_DOMAIN_NAME"}}" #CSP takes care of this but may be needed for organizr.
+        contentTypeNosniff: true
+        browserXssFilter: true
+#        sslForceHost: true # add sslHost to all of the services
+#        sslHost: "{{env "ROOT_DOMAIN_NAME"}}"
+        referrerPolicy: "same-origin"
+        # Setting contentSecurityPolicy is more secure but it can break things. Proper auth will reduce the risk.
+        # the below line also breaks some apps due to 'none' - sonarr, radarr, etc.
+#        contentSecurityPolicy: "frame-ancestors '*.{{env "ROOT_DOMAIN_NAME"}}:*';object-src 'none';script-src 'none';"
+        permissionsPolicy: "camera=(), microphone=(), geolocation=(), payment=(), usb=(), vr=()"
+        customResponseHeaders:
+          X-Robots-Tag: "none,noarchive,nosnippet,notranslate,noimageindex,"
+          server: ""
+          # https://community.traefik.io/t/how-to-make-websockets-work-with-traefik-2-0-setting-up-rancher/1732
+#          X-Forwarded-Proto: "https"
+
+    middlewares-authelia:
+      forwardAuth:
+        address: "http://authelia:9091/api/verify?rd=https://authelia.{{env "ROOT_DOMAIN_NAME"}}"
+        trustForwardHeader: true
+        authResponseHeaders:
+          - "Remote-User"
+          - "Remote-Groups"
+
+    middlewares-compress:
+      compress: {}

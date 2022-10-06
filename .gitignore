@@ -1,0 +1,17 @@
+.idea/
+AppData/MariaDB/*
+!AppData/MariaDB/.gitkeep
+secrets/*
+!secrets/.gitkeep
+.env
+docker-compose.yml
+
+# Traefik
+AppData/traefik-proxy/access.log
+AppData/traefik-proxy/traefik.log
+AppData/traefik-proxy/traefik.yml
+
+# Authelia
+AppData/authelia/configuration.yml
+AppData/authelia/authelia.log
+AppData/authelia/notification.txt
