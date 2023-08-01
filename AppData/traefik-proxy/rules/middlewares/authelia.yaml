@@ -1,0 +1,12 @@
+#
+# Middleware to secure a host behind an authelia login
+#
+http:
+  middlewares:
+    middlewares-authelia:
+      forwardAuth:
+        address: "http://authelia:9091/api/verify?rd=https://authelia.{{env "ROOT_DOMAIN_NAME"}}"
+        trustForwardHeader: true
+        authResponseHeaders:
+          - "Remote-User"
+          - "Remote-Groups"

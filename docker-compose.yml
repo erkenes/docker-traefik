@@ -1,0 +1,63 @@
+version: "3.9"
+
+services:
+  traefik-proxy:
+    extends:
+      file: docker-compose.base.yml
+      service: traefik-proxy
+
+  socket-proxy:
+    extends:
+      file: docker-compose.base.yml
+      service: socket-proxy
+
+  mariadb:
+    extends:
+      file: docker-compose.base.yml
+      service: mariadb
+
+  authelia:
+    extends:
+      file: docker-compose.base.yml
+      service: authelia
+
+  redis:
+    extends:
+      file: docker-compose.base.yml
+      service: redis
+
+
+#-----------
+# Networks
+#-----------
+networks:
+  traefik-internal:
+    name: traefik-internal
+    driver: bridge
+  traefik-proxy:
+    name: traefik-proxy
+    driver: bridge
+  socket-proxy:
+    name: socket-proxy
+    driver: bridge
+
+#-----------
+# Secrets
+#-----------
+secrets:
+  authelia_jwt_secret:
+    file: ./secrets/authelia_jwt_secret
+  authelia_session_secret:
+    file: ./secrets/authelia_session_secret
+  authelia_notifier_smtp_password:
+    file: ./secrets/authelia_notifier_smtp_password
+  authelia_storage_encryption_key:
+    file: ./secrets/authelia_storage_encryption_key
+  authelia_hmac_secret:
+    file: ./secrets/authelia_hmac_secret
+  authelia_oidc_issuer_private_key:
+    file: ./secrets/authelia_oidc_issuer_private_key
+  mysql_root_password:
+    file: ./secrets/mysql_root_password
+  mysql_password:
+    file: ./secrets/mysql_password

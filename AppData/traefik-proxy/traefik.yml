@@ -1,0 +1,48 @@
+global:
+  checkNewVersion: true
+  sendAnonymousUsage: false
+entryPoints:
+  http:
+    address: :80
+  https:
+    address: :443
+    http:
+      tls:
+        domains:
+          # ToDo: Replace domain
+          - main: 'traefik.local.dev'
+            sans:
+              - '*.local.dev'
+  ping:
+    address: :8081
+hub:
+  tls:
+    insecure: false
+metrics:
+  prometheus:
+    addRoutersLabels: true
+api:
+  insecure: false
+  dashboard: true
+ping:
+  entryPoint: ping
+log:
+  level: WARN
+  filePath: '/etc/traefik/traefik.log'
+
+accessLog:
+  filePath: '/etc/traefik/access.log'
+  bufferingSize: 100
+  filters:
+    statusCodes:
+      - 400-499
+
+providers:
+  docker:
+    endpoint: 'tcp://socket-proxy:2375'
+    exposedByDefault: false
+    network: 'traefik-proxy'
+    swarmMode: false
+  file:
+    directory: '/etc/traefik/rules'
+    watch: true

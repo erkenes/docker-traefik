@@ -1,0 +1,15 @@
+#
+# Middleware chain for a host with no auth but some security middlewares
+#
+# usage:
+# traefik.http.routers.NAME.middlewares=chain-no-auth@file'
+#
+http:
+  middlewares:
+    chain-no-auth:
+      chain:
+        middlewares:
+          - middlewares-rate-limit
+          - middlewares-https-redirect-scheme
+          - middlewares-secure-headers
+          - middlewares-compress
