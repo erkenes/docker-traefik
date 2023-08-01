@@ -1,0 +1,9 @@
+#
+# Compress Responses before Sending them to the Client
+#
+# See: https://doc.traefik.io/traefik/middlewares/http/compress/
+#
+http:
+  middlewares:
+    middlewares-compress:
+      compress: {}

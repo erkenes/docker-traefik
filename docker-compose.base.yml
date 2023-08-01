@@ -1,0 +1,194 @@
+version: "3.9"
+
+services:
+  traefik-proxy:
+    image: traefik:2.10
+    restart: always
+    depends_on:
+      - socket-proxy
+    networks:
+      - traefik-internal
+      - traefik-proxy
+      - socket-proxy
+    security_opt:
+      - no-new-privileges:true
+    healthcheck:
+      test: [ 'CMD', 'traefik', 'healthcheck', '--ping' ]
+      interval: 5s
+      retries: 3
+    ports:
+      - '0.0.0.0:80:80'
+      - '0.0.0.0:443:443'
+    volumes:
+      - './AppData/traefik-proxy:/etc/traefik'
+      - './certs:/certs:ro'
+    environment:
+      ROOT_DOMAIN_NAME: '${ROOT_DOMAIN_NAME}'
+    labels:
+      - 'traefik.enable=true'
+      - 'traefik.http.routers.http-catchall.entrypoints=http'
+      - 'traefik.http.routers.http-catchall.rule=HostRegexp(`{host:.+}`)'
+      - 'traefik.http.routers.http-catchall.middlewares=middlewares-https-redirect-scheme@file'
+      - 'traefik.http.routers.traefik-rtr.tls=true'
+      - 'traefik.http.routers.traefik-rtr.entrypoints=https'
+      - 'traefik.http.routers.traefik-rtr.rule=Host(`traefik.${ROOT_DOMAIN_NAME}`)'
+      - 'traefik.http.routers.traefik-rtr.service=api@internal'
+      - 'traefik.http.routers.ping.rule=Host(`traefik.${ROOT_DOMAIN_NAME}`) && Path(`/ping`)'
+      - 'traefik.http.routers.ping.tls=true'
+      - 'traefik.http.routers.ping.service=ping@internal'
+#      - 'traefik.http.routers.traefik-rtr.middlewares=chain-authelia@file'
+
+  socket-proxy:
+    image: tecnativa/docker-socket-proxy:0.1.1
+    restart: always
+    networks:
+      - socket-proxy
+    security_opt:
+      - no-new-privileges:true
+    healthcheck:
+      test: [ NONE, 'wget --spider http://localhost:2375/version || exit 1' ]
+      interval: 29s
+      retries: 3
+      timeout: 5s
+      start_period: 21s
+    volumes:
+      - '/var/run/docker.sock:/var/run/docker.sock'
+    environment:
+      - LOG_LEVEL=info
+      - EVENTS=1
+      - PING=1
+      - VERSION=1
+      - AUTH=0
+      - SECRETS=0
+      - POST=0
+      - BUILD=0
+      - COMMIT=0
+      - CONFIGS=0
+      - CONTAINERS=1
+      - DISTRIBUTION=0
+      - EXEC=0
+      - IMAGES=0
+      - INFO=0
+      - NETWORKS=0
+      - NODES=0
+      - PLUGINS=0
+      - SERVICES=0
+      - SESSION=0
+      - SWARM=0
+      - SYSTEM=0
+      - TASKS=0
+      - VOLUMES=0
+
+  mariadb:
+    image: linuxserver/mariadb:10.5.17
+    restart: always
+    networks:
+      - traefik-internal
+    security_opt:
+      - no-new-privileges:true
+    ports:
+      - '127.0.0.1:3306:3306' # only allow local access
+    volumes:
+      - './AppData/MariaDB/data:/config'
+    environment:
+      TZ: '${TIMEZONE}'
+      PUID: '${PUID}'
+      PGID: '${PGID}'
+      MYSQL_DATABASE: 'authelia'
+      MYSQL_USER: 'authelia'
+      FILE__MYSQL_PASSWORD: '/run/secrets/mysql_password'
+      FILE__MYSQL_ROOT_PASSWORD: '/run/secrets/mysql_root_password'
+    secrets:
+      - mysql_root_password
+      - mysql_password
+
+  authelia:
+    image: authelia/authelia:4.36.9
+    restart: always
+    networks:
+      - traefik-internal
+      - traefik-proxy
+    volumes:
+      - './AppData/authelia:/config'
+    links:
+      - redis
+    depends_on:
+      - redis
+    environment:
+      TZ: '${TIMEZONE}'
+      AUTHELIA_JWT_SECRET_FILE: '/run/secrets/authelia_jwt_secret'
+      AUTHELIA_SESSION_SECRET_FILE: '/run/secrets/authelia_session_secret'
+      AUTHELIA_STORAGE_MYSQL_PASSWORD_FILE: '/run/secrets/mysql_password'
+      AUTHELIA_NOTIFIER_SMTP_PASSWORD_FILE: '/run/secrets/authelia_notifier_smtp_password'
+      AUTHELIA_STORAGE_ENCRYPTION_KEY_FILE: '/run/secrets/authelia_storage_encryption_key'
+      AUTHELIA_IDENTITY_PROVIDERS_OIDC_HMAC_SECRET_FILE: '/run/secrets/authelia_hmac_secret'
+      AUTHELIA_IDENTITY_PROVIDERS_OIDC_ISSUER_PRIVATE_KEY_FILE: '/run/secrets/authelia_oidc_issuer_private_key'
+    secrets:
+      - authelia_jwt_secret
+      - authelia_session_secret
+      - mysql_password
+      - authelia_notifier_smtp_password
+      - authelia_storage_encryption_key
+      - authelia_hmac_secret
+      - authelia_oidc_issuer_private_key
+    labels:
+      - 'traefik.enable=true'
+      - 'traefik.http.routers.authelia-rtr.entrypoints=https'
+      - 'traefik.http.routers.authelia-rtr.rule=HostHeader(`authelia.${ROOT_DOMAIN_NAME}`)'
+      - 'traefik.http.routers.authelia-rtr.tls=true'
+      - 'traefik.http.routers.authelia-rtr.middlewares=chain-authelia@file'
+      - 'traefik.http.routers.authelia-rtr.service=authelia-svc'
+      - 'traefik.http.services.authelia-svc.loadbalancer.server.port=9091'
+
+  redis:
+    image: redis:7.0.5-alpine
+    restart: always
+    command:
+      - redis-server
+      - --appendonly
+      - "yes"
+      - --maxmemory
+      - 5124mb
+      - --maxmemory-policy
+      - allkeys-lru
+    networks:
+      - traefik-internal
+    security_opt:
+      - no-new-privileges:true
+    healthcheck:
+      test: ['CMD', 'redis-cli', '--raw', 'incr', 'ping']
+
+#-----------
+# Networks
+#-----------
+networks:
+  traefik-internal:
+    name: traefik-internal
+    driver: bridge
+  traefik-proxy:
+    name: traefik-proxy
+    driver: bridge
+  socket-proxy:
+    name: socket-proxy
+    driver: bridge
+
+#-----------
+# Secrets
+#-----------
+secrets:
+  authelia_jwt_secret:
+    file: ./secrets/authelia_jwt_secret
+  authelia_session_secret:
+    file: ./secrets/authelia_session_secret
+  authelia_notifier_smtp_password:
+    file: ./secrets/authelia_notifier_smtp_password
+  authelia_storage_encryption_key:
+    file: ./secrets/authelia_storage_encryption_key
+  authelia_hmac_secret:
+    file: ./secrets/authelia_hmac_secret
+  authelia_oidc_issuer_private_key:
+    file: ./secrets/authelia_oidc_issuer_private_key
+  mysql_root_password:
+    file: ./secrets/mysql_root_password
+  mysql_password:
+    file: ./secrets/mysql_password

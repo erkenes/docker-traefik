@@ -1,0 +1,12 @@
+#
+# Control the Number of Requests Going to a Service
+#
+# Ensures that services will receive a fair amount of requests, and allows one to define what fair is.
+# See: https://doc.traefik.io/traefik/middlewares/http/ratelimit/
+#
+http:
+  middlewares:
+    middlewares-rate-limit:
+      rateLimit:
+        average: 100
+        burst: 50

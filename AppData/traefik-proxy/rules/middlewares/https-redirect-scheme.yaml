@@ -1,0 +1,11 @@
+#
+# Redirects all requests permanent to HTTPS
+#
+# See: https://doc.traefik.io/traefik/middlewares/http/redirectscheme/
+#
+http:
+  middlewares:
+    middlewares-https-redirect-scheme:
+      redirectScheme:
+        scheme: https
+        permanent: true
