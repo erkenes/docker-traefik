@@ -1,13 +1,9 @@
 .idea/
-AppData/MariaDB/*
-!AppData/MariaDB/.gitkeep
 secrets/*
 !secrets/.gitkeep
+!secrets/cf_api_key
+!secrets/cf_email
 
 # Traefik
 AppData/traefik-proxy/access.log
 AppData/traefik-proxy/traefik.log
-
-# Authelia
-AppData/authelia/authelia.log
-AppData/authelia/notification.txt

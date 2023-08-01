@@ -36,7 +36,6 @@ services:
       - 'traefik.http.routers.ping.rule=Host(`traefik.${ROOT_DOMAIN_NAME}`) && Path(`/ping`)'
       - 'traefik.http.routers.ping.tls=true'
       - 'traefik.http.routers.ping.service=ping@internal'
-#      - 'traefik.http.routers.traefik-rtr.middlewares=chain-authelia@file'
 
   socket-proxy:
     image: tecnativa/docker-socket-proxy:0.1.1
@@ -79,67 +78,6 @@ services:
       - TASKS=0
       - VOLUMES=0
 
-  mariadb:
-    image: linuxserver/mariadb:10.5.17
-    restart: always
-    networks:
-      - traefik-internal
-    security_opt:
-      - no-new-privileges:true
-    ports:
-      - '127.0.0.1:3306:3306' # only allow local access
-    volumes:
-      - './AppData/MariaDB/data:/config'
-    environment:
-      TZ: '${TIMEZONE}'
-      PUID: '${PUID}'
-      PGID: '${PGID}'
-      MYSQL_DATABASE: 'authelia'
-      MYSQL_USER: 'authelia'
-      FILE__MYSQL_PASSWORD: '/run/secrets/mysql_password'
-      FILE__MYSQL_ROOT_PASSWORD: '/run/secrets/mysql_root_password'
-    secrets:
-      - mysql_root_password
-      - mysql_password
-
-  authelia:
-    image: authelia/authelia:4.36.9
-    restart: always
-    networks:
-      - traefik-internal
-      - traefik-proxy
-    volumes:
-      - './AppData/authelia:/config'
-    links:
-      - redis
-    depends_on:
-      - redis
-    environment:
-      TZ: '${TIMEZONE}'
-      AUTHELIA_JWT_SECRET_FILE: '/run/secrets/authelia_jwt_secret'
-      AUTHELIA_SESSION_SECRET_FILE: '/run/secrets/authelia_session_secret'
-      AUTHELIA_STORAGE_MYSQL_PASSWORD_FILE: '/run/secrets/mysql_password'
-      AUTHELIA_NOTIFIER_SMTP_PASSWORD_FILE: '/run/secrets/authelia_notifier_smtp_password'
-      AUTHELIA_STORAGE_ENCRYPTION_KEY_FILE: '/run/secrets/authelia_storage_encryption_key'
-      AUTHELIA_IDENTITY_PROVIDERS_OIDC_HMAC_SECRET_FILE: '/run/secrets/authelia_hmac_secret'
-      AUTHELIA_IDENTITY_PROVIDERS_OIDC_ISSUER_PRIVATE_KEY_FILE: '/run/secrets/authelia_oidc_issuer_private_key'
-    secrets:
-      - authelia_jwt_secret
-      - authelia_session_secret
-      - mysql_password
-      - authelia_notifier_smtp_password
-      - authelia_storage_encryption_key
-      - authelia_hmac_secret
-      - authelia_oidc_issuer_private_key
-    labels:
-      - 'traefik.enable=true'
-      - 'traefik.http.routers.authelia-rtr.entrypoints=https'
-      - 'traefik.http.routers.authelia-rtr.rule=HostHeader(`authelia.${ROOT_DOMAIN_NAME}`)'
-      - 'traefik.http.routers.authelia-rtr.tls=true'
-      - 'traefik.http.routers.authelia-rtr.middlewares=chain-authelia@file'
-      - 'traefik.http.routers.authelia-rtr.service=authelia-svc'
-      - 'traefik.http.services.authelia-svc.loadbalancer.server.port=9091'
-
   redis:
     image: redis:7.0.5-alpine
     restart: always
@@ -171,24 +109,3 @@ networks:
   socket-proxy:
     name: socket-proxy
     driver: bridge
-
-#-----------
-# Secrets
-#-----------
-secrets:
-  authelia_jwt_secret:
-    file: ./secrets/authelia_jwt_secret
-  authelia_session_secret:
-    file: ./secrets/authelia_session_secret
-  authelia_notifier_smtp_password:
-    file: ./secrets/authelia_notifier_smtp_password
-  authelia_storage_encryption_key:
-    file: ./secrets/authelia_storage_encryption_key
-  authelia_hmac_secret:
-    file: ./secrets/authelia_hmac_secret
-  authelia_oidc_issuer_private_key:
-    file: ./secrets/authelia_oidc_issuer_private_key
-  mysql_root_password:
-    file: ./secrets/mysql_root_password
-  mysql_password:
-    file: ./secrets/mysql_password
