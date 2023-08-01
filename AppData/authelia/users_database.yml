@@ -1,8 +1,0 @@
-users:
-    admin:
-        displayname: Admin
-        password: $argon2id$v=19$m=65536,t=3,p=2$3rvpE8G8BMtJkiXalTuxPQ$o1D2uAbXb6axmP1fBi1MLKngGNGbz4fgVj2gYcwDq0M
-        email: admin@local.dev
-        groups:
-            - admin
-            - traefik
