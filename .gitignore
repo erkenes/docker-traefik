@@ -3,6 +3,7 @@ secrets/*
 !secrets/.gitkeep
 !secrets/cf_api_key
 !secrets/cf_email
+.env
 
 # Traefik
 AppData/traefik-proxy/access.log
