@@ -6,13 +6,13 @@ entryPoints:
     address: :80
   https:
     address: :443
-    http:
-      tls:
-        domains:
-          # ToDo: Replace domain
-          - main: 'traefik.local.dev'
-            sans:
-              - '*.local.dev'
+    # Those values are set with the command-block in the docker-compose file
+#    http:
+#      tls:
+#        domains:
+#          - main: 'traefik.local.dev'
+#            sans:
+#              - '*.local.dev'
   ping:
     address: :8081
 hub:

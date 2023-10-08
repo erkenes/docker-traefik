@@ -24,6 +24,10 @@ services:
       - './certs:/certs:ro'
     environment:
       ROOT_DOMAIN_NAME: '${ROOT_DOMAIN_NAME}'
+      TRAEFIK_DOMAIN_NAME: '${TRAEFIK_DOMAIN_NAME}'
+    command:
+      - --entrypoints.https.http.tls.domains[rootDomain].main=$ROOT_DOMAIN_NAME
+      - --entrypoints.https.http.tls.domains[rootDomain].sans=*.$ROOT_DOMAIN_NAME
     labels:
       - 'traefik.enable=true'
       - 'traefik.http.routers.http-catchall.entrypoints=http'
@@ -31,9 +35,9 @@ services:
       - 'traefik.http.routers.http-catchall.middlewares=middlewares-https-redirect-scheme@file'
       - 'traefik.http.routers.traefik-rtr.tls=true'
       - 'traefik.http.routers.traefik-rtr.entrypoints=https'
-      - 'traefik.http.routers.traefik-rtr.rule=Host(`traefik.${ROOT_DOMAIN_NAME}`)'
+      - 'traefik.http.routers.traefik-rtr.rule=Host(`${TRAEFIK_DOMAIN_NAME}`)'
       - 'traefik.http.routers.traefik-rtr.service=api@internal'
-      - 'traefik.http.routers.ping.rule=Host(`traefik.${ROOT_DOMAIN_NAME}`) && Path(`/ping`)'
+      - 'traefik.http.routers.ping.rule=Host(`${TRAEFIK_DOMAIN_NAME}`) && Path(`/ping`)'
       - 'traefik.http.routers.ping.tls=true'
       - 'traefik.http.routers.ping.service=ping@internal'
 

@@ -29,26 +29,12 @@ Before you begin, ensure you have the following prerequisites:
    cp .env.example .env
    ```
 
-4. Change the root domain in the `.env` file to match your domain. Traefik will be available with `trafik.ROOT_DOMAIN_NAME`.
-   You also have to change the root domain in the file [AppData/traefik-proxy/traefik.yml](AppData/traefik-proxy/traefik.yml)
-   ```yaml
-   entryPoints:
-     https:
-       http:
-         tls:
-           domains:
-             # ToDo: Replace domain
-             - main: 'traefik.local.dev'
-               sans:
-                 - '*.local.dev'
-    ```
-
-5. Start Traefik
+4. Start Traefik
    ```shell
    docker compose -f docker-compose.yml up -d
    ```
 
-6. Your Traefik reverse proxy is now up and running, ready to route incoming traffic to your web services.
+5. Your Traefik reverse proxy is now up and running, ready to route incoming traffic to your web services.
 
 ## Optional Cloudflare Integration
 
@@ -84,7 +70,7 @@ services:
     labels:
       - "traefik.enable=true"
       ## HTTP Routers
-      - "traefik.http.routers.whoami-rtr.rule=Host(`whoami.$DOMAIN`)"
+      - "traefik.http.routers.whoami-rtr.rule=Host(`whoami.$ROOT_DOMAIN_NAME`)"
       - "traefik.http.routers.whoami-rtr.entrypoints=https"
       - "traefik.http.routers.whoami-rtr.tls=true"
 networks:
