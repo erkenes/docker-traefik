@@ -5,6 +5,11 @@ services:
     extends:
       file: docker-compose.base.yml
       service: traefik-proxy
+    command:
+      - --entrypoints.https.http.tls.domains[rootDomain].main=$ROOT_DOMAIN_NAME
+      - --entrypoints.https.http.tls.domains[rootDomain].sans=*.$ROOT_DOMAIN_NAME
+      - --tls.stores.default.defaultCertificate.certFile=/certs/local.crt
+      - --tls.stores.default.defaultCertificate.keyFile=/certs/local.key
 
   socket-proxy:
     extends:

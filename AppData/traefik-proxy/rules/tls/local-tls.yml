@@ -1,9 +1,0 @@
-#
-# Overwrites the default certificates
-#
-tls:
-  stores:
-    default:
-      defaultCertificate:
-        certFile: /certs/local.crt
-        KeyFile: /certs/local.key

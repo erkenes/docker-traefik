@@ -25,9 +25,6 @@ services:
     environment:
       ROOT_DOMAIN_NAME: '${ROOT_DOMAIN_NAME}'
       TRAEFIK_DOMAIN_NAME: '${TRAEFIK_DOMAIN_NAME}'
-    command:
-      - --entrypoints.https.http.tls.domains[rootDomain].main=$ROOT_DOMAIN_NAME
-      - --entrypoints.https.http.tls.domains[rootDomain].sans=*.$ROOT_DOMAIN_NAME
     labels:
       - 'traefik.enable=true'
       - 'traefik.http.routers.http-catchall.entrypoints=http'
