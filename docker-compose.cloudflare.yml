@@ -5,12 +5,17 @@ services:
     extends:
       file: docker-compose.base.yml
       service: traefik-proxy
+    command:
+      - --entrypoints.https.http.tls.domains[rootDomain].main=$ROOT_DOMAIN_NAME
+      - --entrypoints.https.http.tls.domains[rootDomain].sans=*.$ROOT_DOMAIN_NAME
     environment:
-      CF_API_EMAIL_FILE: '/run/secrets/cf_email' # Uncomment for Cloudflare support
-      CF_API_KEY_FILE: '/run/secrets/cf_api_key' # Uncomment for Cloudflare support
+      CF_API_EMAIL_FILE: '/run/secrets/cf_email'
+      CF_API_KEY_FILE: '/run/secrets/cf_api_key'
     secrets:
       - cf_email
       - cf_api_key
+    labels:
+      - 'traefik.http.routers.traefik-rtr.tls.certresolver=dns-cloudflare'
 
   socket-proxy:
     extends:
