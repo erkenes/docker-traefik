@@ -43,13 +43,24 @@ You have to follow the upper instructions first.
 1. Add your cloudflare api credentials to the secret files
     - `secrets/cf_api_key` for the api key
     - `secrets/cf_email` for your email address
+    
+   **Make sure that there is no empty line at the end of the secret files!**
 
-2. Start Traefik
+2. Set your email address in the [traefik.yml](AppData/traefik-proxy/traefik.yml) file.
+   ```yaml
+   certificatesResolvers:
+     dns-cloudflare:
+       acme:
+         # ToDo: Change this value with your email address
+         email: 'your@mail.com'
+   ```
+
+3. Start Traefik
    ```shell
    docker compose -f docker-compose.cloudflare.yml up -d
    ```
 
-3. Your Traefik reverse proxy is now up and running, ready to route incoming traffic to your web services.
+4. Your Traefik reverse proxy is now up and running, ready to route incoming traffic to your web services.
 
 ## Optional Authentication Server
 

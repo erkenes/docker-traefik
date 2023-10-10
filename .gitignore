@@ -8,3 +8,4 @@ secrets/*
 # Traefik
 AppData/traefik-proxy/access.log
 AppData/traefik-proxy/traefik.log
+AppData/traefik-proxy/acme.json
