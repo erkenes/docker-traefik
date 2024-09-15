@@ -44,7 +44,7 @@ providers:
     network: 'traefik-proxy'
     swarmMode: false
   file:
-    directory: '/etc/traefik/rules'
+    directory: '/etc/traefik/dynamic'
     watch: true
 certificatesResolvers:
   dns-cloudflare:

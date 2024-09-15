@@ -1,8 +1,8 @@
 .idea/
 secrets/*
 !secrets/.gitkeep
-!secrets/cf_api_key
-!secrets/cf_email
+secrets/cf_api_key
+secrets/cf_email
 .env
 
 # Traefik
