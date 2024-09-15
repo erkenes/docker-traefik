@@ -53,3 +53,10 @@ certificatesResolvers:
       storage: /etc/traefik/acme/cloudflare.json
       dnsChallenge:
         provider: cloudflare
+  letsencrypt:
+    acme:
+      # ToDo: Change this value with your email address
+      email: hostmaster@YOUR_DOMAIN.com
+      storage: /etc/traefik/acme/letsencrypt.json
+      caServer: https://acme-staging-v02.api.letsencrypt.org/directory # do not use in production
+      tlsChallenge: {}

@@ -160,13 +160,10 @@ certificatesResolvers:
          email: 'your@mail.com'
 ```
 
-Use the traefik-compose file by editing the [compose.yml](compose.yml) file.
+Change the cert resolver for the dashboard in the `.env` file.
 
-```yaml
-include:
-  - ./lib/compose.dockerproxy.yml
-#  - ./lib/compose.traefik.yml
-  - ./lib/compose.traefik.cloudflare.yml
+```text
+TRAEFIK_DASHBOARD_CERT_RESOLVER=dns-cloudflare
 ```
 
 ## Optional Features / Integrations
