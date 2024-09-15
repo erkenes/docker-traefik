@@ -1,5 +1,5 @@
 services:
-  traefik-proxy:
+  traefik:
     image: traefik:2.10
     read_only: true
     restart: always
@@ -27,7 +27,7 @@ services:
       - '${ROOT_PATH}/lib/traefik/access.log:/etc/traefik/access.log'      # access log
       - '${CA_PATH}/:/etc/traefik/certs/:ro'                               # certificate storage
     networks:
-      - traefik-proxy
+      - traefik
       - docker-proxy
     labels:
       - 'traefik.enable=true'
@@ -56,6 +56,6 @@ services:
     # sudo useradd -u 2000 -M -s /usr/sbin/nologin traefik
 
 networks:
-  traefik-proxy:
-    name: traefik-proxy
+  traefik:
+    name: traefik
     driver: bridge

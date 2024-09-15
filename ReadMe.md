@@ -188,7 +188,7 @@ services:
    whoami:
       image: traefik/whoami
       networks:
-         - traefik-proxy
+         - traefik
       labels:
          - "traefik.enable=true"
          ## HTTP Routers
@@ -196,7 +196,7 @@ services:
          - "traefik.http.routers.whoami-rtr.entrypoints=https"
          - "traefik.http.routers.whoami-rtr.tls=true"
 networks:
-   traefik-proxy:
+   traefik:
       external: true
 ```
 
