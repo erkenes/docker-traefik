@@ -1,8 +1,8 @@
 services:
-  traefik-proxy:
+  traefik:
     extends:
       file: ./compose.traefik.yml
-      service: traefik-proxy
+      service: traefik
     environment:
       CF_API_EMAIL_FILE: '/run/secrets/cf_email'
       CF_API_KEY_FILE: '/run/secrets/cf_api_key'
@@ -23,6 +23,6 @@ secrets:
     file: '${ROOT_PATH}/secrets/cf_api_key'
 
 networks:
-  traefik-proxy:
-    name: traefik-proxy
+  traefik:
+    name: traefik
     driver: bridge
