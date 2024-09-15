@@ -1,0 +1,18 @@
+include:
+  - ./lib/compose.dockerproxy.yml
+  - ./lib/compose.traefik.yml
+#  - ./lib/compose.traefik.cloudflare.yml
+
+#-----------
+# Networks
+#-----------
+networks:
+  traefik-internal:
+    name: traefik-internal
+    driver: bridge
+  traefik-proxy:
+    name: traefik-proxy
+    driver: bridge
+  socket-proxy:
+    name: socket-proxy
+    driver: bridge

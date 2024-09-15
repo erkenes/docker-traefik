@@ -1,9 +1,7 @@
-version: "3.9"
-
 services:
   traefik-proxy:
     extends:
-      file: docker-compose.base.yml
+      file: compose.traefik.yml
       service: traefik-proxy
     command:
       - --entrypoints.https.http.tls.domains[rootDomain].main=$ROOT_DOMAIN_NAME
@@ -17,35 +15,11 @@ services:
     labels:
       - 'traefik.http.routers.traefik-rtr.tls.certresolver=dns-cloudflare'
 
-  socket-proxy:
-    extends:
-      file: docker-compose.base.yml
-      service: socket-proxy
-
-  redis:
-    extends:
-      file: docker-compose.base.yml
-      service: redis
-
-#-----------
-# Networks
-#-----------
-networks:
-  traefik-internal:
-    name: traefik-internal
-    driver: bridge
-  traefik-proxy:
-    name: traefik-proxy
-    driver: bridge
-  socket-proxy:
-    name: socket-proxy
-    driver: bridge
-
 #-----------
 # Secrets
 #-----------
 secrets:
   cf_email:
-    file: ./secrets/cf_email
+    file: ../secrets/cf_email
   cf_api_key:
-    file: ./secrets/cf_api_key
+    file: ../secrets/cf_api_key
