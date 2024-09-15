@@ -3,16 +3,15 @@ services:
     image: traefik:2.10
     restart: always
     depends_on:
-      - socket-proxy
+      - docker-proxy
     command:
       - --entrypoints.https.http.tls.domains[rootDomain].main=$ROOT_DOMAIN_NAME
       - --entrypoints.https.http.tls.domains[rootDomain].sans=*.$ROOT_DOMAIN_NAME
       - --tls.stores.default.defaultCertificate.certFile=/certs/local.crt
       - --tls.stores.default.defaultCertificate.keyFile=/certs/local.key
     networks:
-      - traefik-internal
       - traefik-proxy
-      - socket-proxy
+      - docker-proxy
     security_opt:
       - no-new-privileges:true
     healthcheck:
@@ -20,18 +19,20 @@ services:
       interval: 5s
       retries: 3
     ports:
-      - '0.0.0.0:80:80'
-      - '0.0.0.0:443:443'
+      - '0.0.0.0:80:10080'
+      - '0.0.0.0:443:10443'
+#      - '127.0.0.1:8080:8080' # do not use this in production
     volumes:
-      - './traefik/traefik.yml:/etc/traefik/traefik.yml:ro'   # Static Traefik Configuration
-      - './traefik/dynamic/:/etc/traefik/dynamic/:ro'         # Folder to store dynamic configuration file provider
-      - './traefik/acme/cloudflare.json:/etc/traefik/acme/cloudflare.json'    # certificate storage
-      - './traefik/traefik.log:/etc/traefik/traefik.log'    # traefik log
-      - './traefik/access.log:/etc/traefik/access.log'      # access log
-      - '../certs/:/etc/traefik/certs/:ro'                  # certificate storage
+      - '${ROOT_PATH}/traefik/traefik.yml:/etc/traefik/traefik.yml:ro'   # Static Traefik Configuration
+      - '${ROOT_PATH}/traefik/dynamic/:/etc/traefik/dynamic/:ro'         # Folder to store dynamic configuration file provider
+      - '${ROOT_PATH}/traefik/acme/cloudflare.json:/etc/traefik/acme/cloudflare.json'    # certificate storage
+      - '${ROOT_PATH}/traefik/traefik.log:/etc/traefik/traefik.log'    # traefik log
+      - '${ROOT_PATH}/traefik/access.log:/etc/traefik/access.log'      # access log
+      - '${CA_PATH}/certs/:/etc/traefik/certs/:ro'                  # certificate storage
     environment:
       ROOT_DOMAIN_NAME: '${ROOT_DOMAIN_NAME}'
-      TRAEFIK_DOMAIN_NAME: '${TRAEFIK_DOMAIN_NAME}'
+      TRAEFIK_DASHBOARD_HOST: '${TRAEFIK_DASHBOARD_HOST}'
+      TZ: '${TIMEZONE}'
     labels:
       - 'traefik.enable=true'
       - 'traefik.http.routers.http-catchall.entrypoints=http'
@@ -39,8 +40,15 @@ services:
       - 'traefik.http.routers.http-catchall.middlewares=middlewares-https-redirect-scheme@file'
       - 'traefik.http.routers.traefik-rtr.tls=true'
       - 'traefik.http.routers.traefik-rtr.entrypoints=https'
-      - 'traefik.http.routers.traefik-rtr.rule=Host(`${TRAEFIK_DOMAIN_NAME}`)'
+      - 'traefik.http.routers.traefik-rtr.rule=Host(`${TRAEFIK_DASHBOARD_HOST}`)'
       - 'traefik.http.routers.traefik-rtr.service=api@internal'
-      - 'traefik.http.routers.ping.rule=Host(`${TRAEFIK_DOMAIN_NAME}`) && Path(`/ping`)'
+      - 'traefik.http.routers.ping.rule=Host(`${TRAEFIK_DASHBOARD_HOST}`) && Path(`/ping`)'
       - 'traefik.http.routers.ping.tls=true'
       - 'traefik.http.routers.ping.service=ping@internal'
+    user: "${TRAEFIK_UID}:${TRAEFIK_UID}" # user traefik has to be created on the host system
+    # sudo useradd -u 2000 -M -s /usr/sbin/nologin traefik
+
+networks:
+  traefik-proxy:
+    name: traefik-proxy
+    driver: bridge

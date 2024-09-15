@@ -3,9 +3,9 @@ global:
   sendAnonymousUsage: false
 entryPoints:
   http:
-    address: :80
+    address: :10080
   https:
-    address: :443
+    address: :10443
     # Those values are set with the command-block in the docker-compose file
 #    http:
 #      tls:
@@ -39,7 +39,7 @@ accessLog:
 
 providers:
   docker:
-    endpoint: 'tcp://socket-proxy:2375'
+    endpoint: 'tcp://docker-proxy:2375'
     exposedByDefault: false
     network: 'traefik-proxy'
     swarmMode: false
