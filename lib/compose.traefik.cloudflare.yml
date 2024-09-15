@@ -1,7 +1,7 @@
 services:
   traefik-proxy:
     extends:
-      file: compose.traefik.yml
+      file: ./compose.traefik.yml
       service: traefik-proxy
     environment:
       CF_API_EMAIL_FILE: '/run/secrets/cf_email'
@@ -10,7 +10,8 @@ services:
       - cf_email
       - cf_api_key
     labels:
-      - 'traefik.http.routers.traefik-rtr.tls.certresolver=dns-cloudflare'
+      - 'traefik.http.routers.traefik-dashboard.tls.certresolver=dns-cloudflare'
+
 
 #-----------
 # Secrets

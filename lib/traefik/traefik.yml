@@ -1,31 +1,30 @@
 global:
   checkNewVersion: true
   sendAnonymousUsage: false
+
 entryPoints:
   http:
     address: :10080
   https:
     address: :10443
-    # Those values are set with the command-block in the docker-compose file
-#    http:
-#      tls:
-#        domains:
-#          - main: 'traefik.local.dev'
-#            sans:
-#              - '*.local.dev'
   ping:
     address: :8081
+
 hub:
   tls:
     insecure: false
+
 metrics:
   prometheus:
     addRoutersLabels: true
+
 api:
   insecure: false
   dashboard: true
+
 ping:
   entryPoint: ping
+
 log:
   level: WARN
   filePath: '/etc/traefik/traefik.log'
@@ -46,11 +45,12 @@ providers:
   file:
     directory: '/etc/traefik/dynamic'
     watch: true
+
 certificatesResolvers:
   dns-cloudflare:
     acme:
       # ToDo: Change this value with your email address
-      email: 'your@mail.com'
+      email: hostmaster@YOUR_DOMAIN.com
       storage: /etc/traefik/acme/cloudflare.json
       dnsChallenge:
         provider: cloudflare
