@@ -51,6 +51,6 @@ certificatesResolvers:
     acme:
       # ToDo: Change this value with your email address
       email: 'your@mail.com'
-      storage: /etc/traefik/acme.json
+      storage: /etc/traefik/acme/cloudflare.json
       dnsChallenge:
         provider: cloudflare
