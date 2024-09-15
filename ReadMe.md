@@ -86,6 +86,8 @@ Place all certificates into the folder that is defined in the `.env` file.
 
 ```shell
 docker compose up -d
+
+docker compose --profile traefik up -d
 ```
 
 
@@ -142,7 +144,8 @@ mkcert -cert-file certs/local.crt -key-file certs/local.key "local.dev" "*.local
 
 You have to follow the upper instructions first.
 
-Add your cloudflare api credentials to the secret files
+To use the Cloudflare integration, you need to add your Cloudflare API credentials to the secret files.
+
 - `secrets/cf_api_key` for the api key
 - `secrets/cf_email` for your email address
 
@@ -151,10 +154,19 @@ Add your cloudflare api credentials to the secret files
 Set your email address in the [traefik.yml](AppData/traefik-proxy/traefik.yml) file.
 ```yaml
 certificatesResolvers:
-  dns-cloudflare:
-    acme:
-      # ToDo: Change this value with your email address
-      email: 'your@mail.com'
+   dns-cloudflare:
+      acme:
+         # ToDo: Change this value with your email address
+         email: 'your@mail.com'
+```
+
+Use the traefik-compose file by editing the [compose.yml](compose.yml) file.
+
+```yaml
+include:
+  - ./lib/compose.dockerproxy.yml
+#  - ./lib/compose.traefik.yml
+  - ./lib/compose.traefik.cloudflare.yml
 ```
 
 ## Optional Features / Integrations
@@ -173,19 +185,19 @@ Consult the Traefik documentation for details on how to configure routing and SS
 ```yaml
 version: '3.9'
 services:
-  whoami:
-    image: traefik/whoami
-    networks:
-      - traefik-proxy
-    labels:
-      - "traefik.enable=true"
-      ## HTTP Routers
-      - "traefik.http.routers.whoami-rtr.rule=Host(`whoami.$ROOT_DOMAIN_NAME`)"
-      - "traefik.http.routers.whoami-rtr.entrypoints=https"
-      - "traefik.http.routers.whoami-rtr.tls=true"
+   whoami:
+      image: traefik/whoami
+      networks:
+         - traefik-proxy
+      labels:
+         - "traefik.enable=true"
+         ## HTTP Routers
+         - "traefik.http.routers.whoami-rtr.rule=Host(`whoami.$ROOT_DOMAIN_NAME`)"
+         - "traefik.http.routers.whoami-rtr.entrypoints=https"
+         - "traefik.http.routers.whoami-rtr.tls=true"
 networks:
-  traefik-proxy:
-    external: true
+   traefik-proxy:
+      external: true
 ```
 
 
