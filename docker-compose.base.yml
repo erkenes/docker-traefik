@@ -83,24 +83,6 @@ services:
       - TASKS=0
       - VOLUMES=0
 
-  redis:
-    image: redis:7.0.5-alpine
-    restart: always
-    command:
-      - redis-server
-      - --appendonly
-      - "yes"
-      - --maxmemory
-      - 5124mb
-      - --maxmemory-policy
-      - allkeys-lru
-    networks:
-      - traefik-internal
-    security_opt:
-      - no-new-privileges:true
-    healthcheck:
-      test: ['CMD', 'redis-cli', '--raw', 'incr', 'ping']
-
 #-----------
 # Networks
 #-----------
