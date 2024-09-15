@@ -28,6 +28,7 @@ services:
       - '${ROOT_PATH}/lib/traefik/traefik.yml:/etc/traefik/traefik.yml:ro' # Static Traefik Configuration
       - '${ROOT_PATH}/lib/traefik/dynamic/:/etc/traefik/dynamic/:ro'       # Folder to store dynamic configuration file provider
       - '${ROOT_PATH}/lib/traefik/acme/cloudflare.json:/etc/traefik/acme/cloudflare.json'   # certificate storage
+      - '${ROOT_PATH}/lib/traefik/acme/letsencrypt.json:/etc/traefik/acme/letsencrypt.json' # certificate storage
       - '${ROOT_PATH}/lib/traefik/traefik.log:/etc/traefik/traefik.log'    # traefik log
       - '${ROOT_PATH}/lib/traefik/access.log:/etc/traefik/access.log'      # access log
       - '${CA_PATH}/:/etc/traefik/certs/:ro'                               # certificate storage
