@@ -41,7 +41,6 @@ providers:
     endpoint: 'tcp://docker-proxy:2375'
     exposedByDefault: false
     network: 'traefik'
-    swarmMode: false
   file:
     directory: '/etc/traefik/dynamic'
     watch: true
