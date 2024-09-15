@@ -1,41 +1,37 @@
 services:
-  socket-proxy:
-    image: tecnativa/docker-socket-proxy:0.1.1
+  docker-proxy:
+    image: wollomatic/socket-proxy:1 # see https://github.com/wollomatic/socket-proxy for reference
     restart: always
-    networks:
-      - socket-proxy
+    read_only: true
+    command:
+      - '-loglevel=info' # set to debug for far more logging
+      - '-allowfrom=traefik'
+      - '-listenip=0.0.0.0'
+      - '-allowGET=/v1\..{1,2}/(version|containers/.*|events.*)' # this regexp allows readonly access only for requests that traefik needs
+      - '-shutdowngracetime=5'
+      - '-watchdoginterval=600'
+      - '-stoponwatchdog'
+      -  '-allowhealthcheck'
+    healthcheck:
+      test: [ "CMD", "./healthcheck" ]
+      interval: 10s
+      timeout: 5s
+      retries: 2
+    deploy:
+      resources:
+        limits:
+          memory: 64M
+    cap_drop:
+      - ALL
     security_opt:
       - no-new-privileges:true
-    healthcheck:
-      test: [ NONE, 'wget --spider http://localhost:2375/version || exit 1' ]
-      interval: 29s
-      retries: 3
-      timeout: 5s
-      start_period: 21s
+    user: '65534:${DOCKER_GID}'
     volumes:
       - '/var/run/docker.sock:/var/run/docker.sock'
-    environment:
-      - LOG_LEVEL=info
-      - EVENTS=1
-      - PING=1
-      - VERSION=1
-      - AUTH=0
-      - SECRETS=0
-      - POST=0
-      - BUILD=0
-      - COMMIT=0
-      - CONFIGS=0
-      - CONTAINERS=1
-      - DISTRIBUTION=0
-      - EXEC=0
-      - IMAGES=0
-      - INFO=0
-      - NETWORKS=0
-      - NODES=0
-      - PLUGINS=0
-      - SERVICES=0
-      - SESSION=0
-      - SWARM=0
-      - SYSTEM=0
-      - TASKS=0
-      - VOLUMES=0
+    networks:
+      - docker-proxy
+
+networks:
+  docker-proxy:
+    name: docker-proxy
+    internal: true

@@ -3,9 +3,6 @@ services:
     extends:
       file: compose.traefik.yml
       service: traefik-proxy
-    command:
-      - --entrypoints.https.http.tls.domains[rootDomain].main=$ROOT_DOMAIN_NAME
-      - --entrypoints.https.http.tls.domains[rootDomain].sans=*.$ROOT_DOMAIN_NAME
     environment:
       CF_API_EMAIL_FILE: '/run/secrets/cf_email'
       CF_API_KEY_FILE: '/run/secrets/cf_api_key'
@@ -20,6 +17,11 @@ services:
 #-----------
 secrets:
   cf_email:
-    file: ../secrets/cf_email
+    file: '${ROOT_PATH}/secrets/cf_email'
   cf_api_key:
-    file: ../secrets/cf_api_key
+    file: '${ROOT_PATH}/secrets/cf_api_key'
+
+networks:
+  traefik-proxy:
+    name: traefik-proxy
+    driver: bridge
