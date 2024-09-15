@@ -6,6 +6,6 @@ secrets/*
 .env
 
 # Traefik
-AppData/traefik-proxy/access.log
-AppData/traefik-proxy/traefik.log
-AppData/traefik-proxy/acme.json
+lib/traefik/access.log
+lib/traefik/traefik.log
+lib/traefik/acme/cloudflare.json

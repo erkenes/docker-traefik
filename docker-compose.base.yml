@@ -20,8 +20,12 @@ services:
       - '0.0.0.0:80:80'
       - '0.0.0.0:443:443'
     volumes:
-      - './AppData/traefik-proxy:/etc/traefik'
-      - './certs:/certs:ro'
+      - './lib/traefik/traefik.yml:/etc/traefik/traefik.yml:ro'   # Static Traefik Configuration
+      - './lib/traefik/dynamic/:/etc/traefik/dynamic/:ro'         # Folder to store dynamic configuration file provider
+      - './lib/traefik/acme/cloudflare.json:/etc/traefik/acme/cloudflare.json'    # certificate storage
+      - './lib/traefik/traefik.log:/etc/traefik/traefik.log'    # traefik log
+      - './lib/traefik/access.log:/etc/traefik/access.log'      # access log
+      - './certs/:/etc/traefik/certs/:ro'                       # certificate storage
     environment:
       ROOT_DOMAIN_NAME: '${ROOT_DOMAIN_NAME}'
       TRAEFIK_DOMAIN_NAME: '${TRAEFIK_DOMAIN_NAME}'
