@@ -15,6 +15,11 @@ services:
       ROOT_DOMAIN_NAME: '${ROOT_DOMAIN_NAME}'
       TRAEFIK_DASHBOARD_HOST: '${TRAEFIK_DASHBOARD_HOST}'
       TZ: '${TIMEZONE}'
+      CF_API_EMAIL_FILE: '/run/secrets/cf_email'
+      CF_API_KEY_FILE: '/run/secrets/cf_api_key'
+    secrets:
+      - cf_email
+      - cf_api_key
     ports:
       - '0.0.0.0:80:10080'
       - '0.0.0.0:443:10443'
@@ -41,6 +46,7 @@ services:
       - 'traefik.http.routers.traefik-dashboard.tls=true'
       - 'traefik.http.routers.traefik-dashboard.entrypoints=https'
       - 'traefik.http.routers.traefik-dashboard.rule=Host(`${TRAEFIK_DASHBOARD_HOST}`)'
+      - 'traefik.http.routers.traefik-dashboard.tls.certresolver=${TRAEFIK_DASHBOARD_CERT_RESOLVER}'
       - 'traefik.http.routers.traefik-dashboard.service=api@internal'
 
       # Ping
@@ -54,6 +60,12 @@ services:
           cpus: 0.75
     user: "${TRAEFIK_UID}:${TRAEFIK_UID}" # user traefik has to be created on the host system
     # sudo useradd -u 2000 -M -s /usr/sbin/nologin traefik
+
+secrets:
+  cf_email:
+    file: '${ROOT_PATH}/secrets/cf_email'
+  cf_api_key:
+    file: '${ROOT_PATH}/secrets/cf_api_key'
 
 networks:
   traefik:
