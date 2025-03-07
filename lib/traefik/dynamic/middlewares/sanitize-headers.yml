@@ -1,0 +1,8 @@
+http:
+  middlewares:
+    sanitize-headers:
+      headers:
+        customresponseheaders:
+          Server: ""
+          X-Powered-By: ""
+          X-Flow-Powered: ""
