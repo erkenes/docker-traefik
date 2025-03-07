@@ -10,9 +10,9 @@ global:
 ################################################################
 
 entryPoints:
-  http:
+  web:
     address: :10080
-  https:
+  websecure:
     address: :10443
   ping:
     address: :8081

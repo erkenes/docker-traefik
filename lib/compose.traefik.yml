@@ -53,13 +53,13 @@ services:
       - 'traefik.enable=true'
 
       # redirect dashboard to https
-      - 'traefik.http.routers.http-catchall.entrypoints=http'
+      - 'traefik.http.routers.http-dashboard.entrypoints=web'
       - 'traefik.http.routers.http-dashboard.rule=Host(`${TRAEFIK_DASHBOARD_HOST}`)'
-      - 'traefik.http.routers.http-catchall.middlewares=https-redirect-scheme@file'
+      - 'traefik.http.routers.http-dashboard.middlewares=https-redirect-scheme@file'
 
       # traefik dashboard
       - 'traefik.http.routers.traefik-dashboard.tls=true'
-      - 'traefik.http.routers.traefik-dashboard.entrypoints=https'
+      - 'traefik.http.routers.traefik-dashboard.entrypoints=websecure'
       - 'traefik.http.routers.traefik-dashboard.rule=Host(`${TRAEFIK_DASHBOARD_HOST}`)'
       - 'traefik.http.routers.traefik-dashboard.tls.certresolver=${TRAEFIK_DASHBOARD_CERT_RESOLVER}'
       - 'traefik.http.routers.traefik-dashboard.service=api@internal'

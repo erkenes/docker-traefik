@@ -116,7 +116,7 @@ services:
       - "traefik.enable=true"
       ## HTTP Routers
       - "traefik.http.routers.whoami-rtr.rule=Host(`whoami.$ROOT_DOMAIN_NAME`)"
-      - "traefik.http.routers.whoami-rtr.entrypoints=https"
+      - "traefik.http.routers.whoami-rtr.entrypoints=websecure"
       - "traefik.http.routers.whoami-rtr.tls=true"
 
 networks:
