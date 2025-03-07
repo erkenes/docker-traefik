@@ -9,7 +9,7 @@ http:
     chain-no-auth:
       chain:
         middlewares:
-          - middlewares-rate-limit
-          - middlewares-https-redirect-scheme
-          - middlewares-secure-headers
-          - middlewares-compress
+          - rate-limit
+          - https-redirect-scheme
+          - secure-headers
+          - compress
