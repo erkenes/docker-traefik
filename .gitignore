@@ -1,11 +1,2 @@
 .idea/
-secrets/*
-!secrets/.gitkeep
-secrets/cf_api_key
-secrets/cf_email
 .env
-
-# Traefik
-lib/traefik/access.log
-lib/traefik/traefik.log
-lib/traefik/acme/cloudflare.json
