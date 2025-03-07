@@ -9,8 +9,11 @@ http:
       headers:
         accessControlAllowMethods:
           - GET
-          - OPTIONS
+          - POST
           - PUT
+          - DELETE
+          - PATCH
+          - OPTIONS
         accessControlMaxAge: 100
         hostsProxyHeaders:
           - "X-Forwarded-Host"
