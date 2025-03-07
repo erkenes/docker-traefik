@@ -18,6 +18,8 @@ entryPoints:
     address: :8081
   metrics:
     address: ":8082"
+  opensearch:
+    address: ":9200"
 
 ################################################################
 # API and dashboard configuration
