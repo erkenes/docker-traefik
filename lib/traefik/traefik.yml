@@ -1,6 +1,13 @@
+################################################################
+# Global configuration
+################################################################
 global:
   checkNewVersion: true
   sendAnonymousUsage: false
+
+################################################################
+# Entrypoints configuration
+################################################################
 
 entryPoints:
   http:
@@ -9,32 +16,43 @@ entryPoints:
     address: :10443
   ping:
     address: :8081
+  metrics:
+    address: ":8082"
 
-hub:
-  tls:
-    insecure: false
-
-metrics:
-  prometheus:
-    addRoutersLabels: true
+################################################################
+# API and dashboard configuration
+################################################################
 
 api:
   insecure: false
   dashboard: true
 
-ping:
-  entryPoint: ping
-
 log:
   level: WARN
-  filePath: '/etc/traefik/traefik.log'
+  filePath: '/etc/traefik/logs/traefik.log'
+  maxBackups: 3
 
 accessLog:
-  filePath: '/etc/traefik/access.log'
+  # the file needs to be manually rotated through logrotate
+  filePath: '/etc/traefik/logs/access.log'
   bufferingSize: 100
   filters:
     statusCodes:
+      - 200
+      - 300-304
       - 400-499
+      - 500-599
+
+################################################################
+# Ping configuration
+################################################################
+
+ping:
+  entryPoint: ping
+
+################################################################
+# Provider configuration
+################################################################
 
 providers:
   docker:
@@ -45,18 +63,34 @@ providers:
     directory: '/etc/traefik/dynamic'
     watch: true
 
+################################################################
+# Monitoring configuration
+################################################################
+
+metrics:
+  prometheus:
+    addEntryPointsLabels: true
+    addServicesLabels: true
+    addRoutersLabels: true
+    buckets: [0.1,0.3,1.2,5.0]
+    manualRouting: true
+    entryPoint: "metrics"
+
+################################################################
+# Certificates resolver configuration
+################################################################
+
 certificatesResolvers:
-  dns-cloudflare:
-    acme:
-      # ToDo: Change this value with your email address
-      email: hostmaster@YOUR_DOMAIN.com
-      storage: /etc/traefik/acme/cloudflare.json
-      dnsChallenge:
-        provider: cloudflare
   letsencrypt:
     acme:
       # ToDo: Change this value with your email address
-      email: hostmaster@YOUR_DOMAIN.com
-      storage: /etc/traefik/acme/letsencrypt.json
-      caServer: https://acme-staging-v02.api.letsencrypt.org/directory # do not use in production
+      email: your-ssl@mail.com
+      storage: /etc/traefik/acme/acme.json
       tlsChallenge: {}
+  dns-cloudflare:
+    acme:
+      # ToDo: Change this value with your email address
+      email: your-ssl@mail.com
+      storage: /etc/traefik/acme/cloudflare.json
+      dnsChallenge:
+        provider: cloudflare

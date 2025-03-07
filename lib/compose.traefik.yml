@@ -1,7 +1,7 @@
 services:
   traefik:
     image: traefik:3.1
-    read_only: true
+    container_name: traefik
     restart: always
     depends_on:
       - docker-proxy
@@ -12,8 +12,7 @@ services:
       interval: 5s
       retries: 3
     environment:
-      ROOT_DOMAIN_NAME: '${ROOT_DOMAIN_NAME}'
-      TRAEFIK_DASHBOARD_HOST: '${TRAEFIK_DASHBOARD_HOST}'
+      TRAEFIK_DASHBOARD_HOST: 'preview.smart-home-zentrale.de'
       TZ: '${TIMEZONE}'
       CF_API_EMAIL_FILE: '/run/secrets/cf_email'
       CF_API_KEY_FILE: '/run/secrets/cf_api_key'
@@ -25,22 +24,37 @@ services:
       - '0.0.0.0:443:10443'
 #      - '127.0.0.1:8080:8080' # do not use this in production
     volumes:
-      - '${ROOT_PATH}/lib/traefik/traefik.yml:/etc/traefik/traefik.yml:ro' # Static Traefik Configuration
-      - '${ROOT_PATH}/lib/traefik/dynamic/:/etc/traefik/dynamic/:ro'       # Folder to store dynamic configuration file provider
-      - '${ROOT_PATH}/lib/traefik/acme/cloudflare.json:/etc/traefik/acme/cloudflare.json'   # certificate storage
-      - '${ROOT_PATH}/lib/traefik/acme/letsencrypt.json:/etc/traefik/acme/letsencrypt.json' # certificate storage
-      - '${ROOT_PATH}/lib/traefik/traefik.log:/etc/traefik/traefik.log'    # traefik log
-      - '${ROOT_PATH}/lib/traefik/access.log:/etc/traefik/access.log'      # access log
-      - '${CA_PATH}/:/etc/traefik/certs/:ro'                               # certificate storage
+      # Static Traefik Configuration
+      - type: bind
+        source: ./traefik/traefik.yml
+        target: /etc/traefik/traefik.yml
+        read_only: true
+      # Folder to store dynamic configuration file provider
+      - type: bind
+        source: ./traefik/dynamic/
+        target: /etc/traefik/dynamic/
+        read_only: true
+      # htaccess protection
+      - type: bind
+        source: '${HTPASSWD_PATH}'
+        target: /docker/traefik/htpasswd/
+        read_only: true
+      # certificate storage
+      - type: bind
+        source: '${CERT_PATH}'
+        target: /etc/traefik/certs/
+        read_only: true
+      - '${TRAEFIK_STORAGE_PATH}/logs:/etc/traefik/logs'  # traefik logs
+      - '${ACME_STORAGE_PATH}:/etc/traefik/acme/'         # letsencrypt certificate storage (acme.json needs file permissions 600 and owner 2000:2000)
     networks:
       - traefik
       - docker-proxy
     labels:
       - 'traefik.enable=true'
 
-      # redirect all requests to https
+      # redirect dashboard to https
       - 'traefik.http.routers.http-catchall.entrypoints=http'
-      - 'traefik.http.routers.http-catchall.rule=HostRegexp(`{host:.+}`)'
+      - 'traefik.http.routers.http-dashboard.rule=Host(`${TRAEFIK_DASHBOARD_HOST}`)'
       - 'traefik.http.routers.http-catchall.middlewares=middlewares-https-redirect-scheme@file'
 
       # traefik dashboard
@@ -64,9 +78,9 @@ services:
 
 secrets:
   cf_email:
-    file: '${ROOT_PATH}/secrets/cf_email'
+    file: '${SECRETS_PATH_CF_EMAIL}'
   cf_api_key:
-    file: '${ROOT_PATH}/secrets/cf_api_key'
+    file: '${SECRETS_PATH_CF_API_KEY}'
 
 networks:
   traefik:
