@@ -5,7 +5,7 @@
 #
 http:
   middlewares:
-    middlewares-https-redirect-scheme:
+    https-redirect-scheme:
       redirectScheme:
         scheme: https
         permanent: true

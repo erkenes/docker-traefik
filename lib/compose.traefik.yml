@@ -55,7 +55,7 @@ services:
       # redirect dashboard to https
       - 'traefik.http.routers.http-catchall.entrypoints=http'
       - 'traefik.http.routers.http-dashboard.rule=Host(`${TRAEFIK_DASHBOARD_HOST}`)'
-      - 'traefik.http.routers.http-catchall.middlewares=middlewares-https-redirect-scheme@file'
+      - 'traefik.http.routers.http-catchall.middlewares=https-redirect-scheme@file'
 
       # traefik dashboard
       - 'traefik.http.routers.traefik-dashboard.tls=true'

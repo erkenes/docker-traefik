@@ -6,7 +6,7 @@
 #
 http:
   middlewares:
-    middlewares-rate-limit:
+    rate-limit:
       rateLimit:
         average: 100
         burst: 50

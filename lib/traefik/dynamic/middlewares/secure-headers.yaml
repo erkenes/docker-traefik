@@ -5,7 +5,7 @@
 #
 http:
   middlewares:
-    middlewares-secure-headers:
+    secure-headers:
       headers:
         accessControlAllowMethods:
           - GET
@@ -17,7 +17,7 @@ http:
         accessControlMaxAge: 100
         hostsProxyHeaders:
           - "X-Forwarded-Host"
-#        sslRedirect: true # Replaced with middlewares-https-redirect-scheme
+#        sslRedirect: true # Replaced with https-redirect-scheme
         stsPreload: true
 #        forceSTSHeader: true
 #        frameDeny: true #overwritten by customFrameOptionsValue

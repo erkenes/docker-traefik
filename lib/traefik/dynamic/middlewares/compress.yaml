@@ -5,5 +5,5 @@
 #
 http:
   middlewares:
-    middlewares-compress:
+    compress:
       compress: {}
