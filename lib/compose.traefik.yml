@@ -12,7 +12,7 @@ services:
       interval: 5s
       retries: 3
     environment:
-      TRAEFIK_DASHBOARD_HOST: 'preview.smart-home-zentrale.de'
+      TRAEFIK_DASHBOARD_HOST: '${TRAEFIK_DASHBOARD_HOST}'
       TZ: '${TIMEZONE}'
       CF_API_EMAIL_FILE: '/run/secrets/cf_email'
       CF_API_KEY_FILE: '/run/secrets/cf_api_key'
