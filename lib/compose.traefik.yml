@@ -1,6 +1,6 @@
 services:
   traefik:
-    image: traefik:3.5
+    image: dhi.io/traefik:3.6.5
     container_name: traefik
     restart: always
     depends_on:
@@ -45,7 +45,7 @@ services:
         target: /etc/traefik/certs/
         read_only: true
       - '${TRAEFIK_STORAGE_PATH}/logs:/etc/traefik/logs'  # traefik logs
-      - '${ACME_STORAGE_PATH}:/etc/traefik/acme/'         # letsencrypt certificate storage (acme.json needs file permissions 600 and owner 2000:2000)
+      - '${ACME_STORAGE_PATH}:/etc/traefik/acme/'         # letsencrypt certificate storage (acme.json needs file permissions 600 and owner 65532:65532)
     networks:
       - traefik
       - docker-proxy
@@ -73,8 +73,6 @@ services:
         limits:
           memory: 2G
           cpus: 0.75
-    user: "${TRAEFIK_UID}:${TRAEFIK_UID}" # user traefik has to be created on the host system
-    # sudo useradd -u 2000 -M -s /usr/sbin/nologin traefik
 
 secrets:
   cf_email:
