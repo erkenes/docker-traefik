@@ -3,6 +3,7 @@
 This repository provides a configuration for setting up Traefik as a reverse proxy for websites.
 It supports optionally a Cloudflare integration, and can optionally be coupled with a [authentik server](https://github.com/erkenes/docker-authentik) for user authentication.
 
+> :warning: We are using a [Docker Hardened Image (DHI) for traefik](https://hub.docker.com/hardened-images/catalog/dhi/traefik). You need to log in to the DHI Registry (dhi.io) to pull the image. You can use your default Docker Hub login.
 
 ## Prerequisites
 
@@ -42,7 +43,6 @@ Edit the `.env` file to configure the Traefik proxy. The file contains the follo
 - `TRAEFIK_DASHBOARD_CERT_RESOLVER`: The certificate resolver for the Traefik dashboard.
 - `TIMEZONE`: The timezone for the server.
 - `DOCKER_GID`: The group ID of the Docker group. See the instructions below to get the group ID.
-- `TRAEFIK_UID`: The user ID of the traefik user.
 - `SECRETS_PATH_CF_API_KEY`: The path to the Cloudflare API key (optional).
 - `SECRETS_PATH_CF_EMAIL`: The path to the Cloudflare email address (optional).
 
@@ -52,17 +52,7 @@ Run the following command to read the environment variables from the `.env` file
 source .env
 ```
 
-### Create a traefik user to run traefik in rootless mode
-
-Create a new traefik user on the server to run the traefik container as a non-root user.
-You can change the user id to any other value, but make sure that the user id is not already in use, and you change the `TRAEFIK_UID` in the `.env` file.
-Change the ownership of the traefik directory to the new user and set the permissions of the acme.json file.
-
-```shell
-sudo useradd -u $TRAEFIK_UID -M -s /usr/sbin/nologin traefik
-```
-
-#### Create Base-Structure for traefik
+### Create Base-Structure for traefik
 
 Create the base structure for traefik and set the permissions.
 
@@ -76,10 +66,12 @@ touch $TRAEFIK_STORAGE_PATH/logs/traefik.log
 touch $ACME_STORAGE_PATH/acme.json
 touch $ACME_STORAGE_PATH/cloudflare.json
 
-chown -R $TRAEFIK_UID:$TRAEFIK_UID $TRAEFIK_STORAGE_PATH
-chown -R $TRAEFIK_UID:$TRAEFIK_UID $ACME_STORAGE_PATH
+chown -R 65532:65532 $TRAEFIK_STORAGE_PATH
+chown -R 65532:65532 $ACME_STORAGE_PATH
 chmod 600 $ACME_STORAGE_PATH/*.json
 ```
+
+The hardened image uses the non-root user with the UID and GID `65532`. Make sure that the traefik files are owned by this user.
 
 ### Docker Group-ID
 
