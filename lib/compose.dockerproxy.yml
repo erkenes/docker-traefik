@@ -12,6 +12,7 @@ services:
       - '-watchdoginterval=600'
       - '-stoponwatchdog'
       -  '-allowhealthcheck'
+      - '-allowHEAD=/_ping'
     healthcheck:
       test: [ "CMD", "./healthcheck" ]
       interval: 10s
